@@ -13,9 +13,9 @@ export const theme = {
 } as const;
 
 const pulse = keyframes`
-  0%   { transform: scale(1);   opacity: 0.95; }
-  50%  { transform: scale(1.6); opacity: 0.55; }
-  100% { transform: scale(1);   opacity: 0.95; }
+  0%   { transform: scale(1);   opacity: 0.45; }
+  50%  { transform: scale(1.2); opacity: 0.55; }
+  100% { transform: scale(1);   opacity: 0.45; }
 `;
 
 export const Container = styled.section`
@@ -26,11 +26,14 @@ export const Container = styled.section`
   );
   color: ${theme.text};
   font: 14px/1.4 ui-sans-serif, system-ui, -apple-system, sans-serif;
-  padding: 24px;
-  min-height: 100vh;
+  padding: 40px 24px;
+  min-height: 100svh;
+  width: 100%;
+  margin: auto;
 `;
 
 export const Header = styled.header`
+  text-align: center;
   margin-bottom: 16px;
 `;
 
@@ -53,6 +56,9 @@ export const MapFrame = styled.div`
   border-radius: 10px;
   overflow: hidden;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+  height: 33%;
+  width: 66%;
+  margin: 0 auto;
 `;
 
 export const MapSvg = styled.svg`
@@ -83,6 +89,7 @@ export const FireGlow = styled.circle`
 
 export const FireCore = styled.circle`
   fill: ${theme.fireCore};
+  filter: blur(1.1px);
   transform-box: fill-box;
   transform-origin: center;
 `;
