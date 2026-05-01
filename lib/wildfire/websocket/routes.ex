@@ -9,10 +9,11 @@ defmodule Wildfire.WebSocket.Routes do
     for {path, stream} <- @streams do
       quote do
         get unquote(path) do
-          var!(conn)
-          |> WebSockAdapter.upgrade(Wildfire.WebSocket.Handler, unquote(stream),
-            timeout: :infinity
-          )
+          conn = Plug.Conn.fetch_query_params(var!(conn))
+          handler_arg = {unquote(stream), conn.query_params}
+
+          conn
+          |> WebSockAdapter.upgrade(Wildfire.WebSocket.Handler, handler_arg, timeout: :infinity)
           |> halt()
         end
       end

@@ -91,41 +91,26 @@ defmodule Wildfire.Poller do
           )
         end)
 
-        build_event = fn feature, type ->
-          %{type: type, event: feature}
+        event_rows =
+          [
+            {:created, Enum.map(created, & &1.feature)},
+            {:updated, Enum.map(changed, & &1.feature)},
+            {:resolved, resolved_features}
+          ]
+          |> Enum.reject(fn {_type, features} -> features == [] end)
+          |> Enum.map(fn {type, features} ->
+            %{type: type, event: %{type => features}}
+          end)
+
+        if event_rows != [] do
+          Repo.insert_all(Wildfire.Data.Schema.IncidentEvents, event_rows)
         end
 
-        event_rows =
-          Enum.map(created, &build_event.(&1.feature, :created)) ++
-            Enum.map(changed, &build_event.(&1.feature, :updated)) ++
-            Enum.map(resolved_features, &build_event.(&1, :resolved))
-
-        event_rows
-        |> Enum.chunk_every(500)
-        |> Enum.each(fn chunk ->
-          Repo.insert_all(Wildfire.Data.Schema.IncidentEvents, chunk)
+        Enum.each(event_rows, fn row ->
+          Wildfire.WebSocket.Manager.broadcast(:incidents, row.event)
         end)
 
-        if changed != [] do
-          Wildfire.WebSocket.Manager.broadcast(
-            :incidents,
-            %{updated: Enum.map(changed, & &1.feature)}
-          )
-        end
-
-        if created != [] do
-          Wildfire.WebSocket.Manager.broadcast(
-            :incidents,
-            %{created: Enum.map(created, & &1.feature)}
-          )
-        end
-
         if resolved_source_ids != [] do
-          Wildfire.WebSocket.Manager.broadcast(
-            :incidents,
-            %{resolved: resolved_features}
-          )
-
           from(i in Incident, where: i.source_id in ^resolved_source_ids)
           |> Repo.delete_all()
         end
