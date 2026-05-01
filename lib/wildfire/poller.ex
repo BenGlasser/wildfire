@@ -92,13 +92,7 @@ defmodule Wildfire.Poller do
         end)
 
         build_event = fn feature, type ->
-          %{
-            object_id: get_in(feature, ["properties", "OBJECTID"]),
-            type: type,
-            occurred_at: now,
-            feature: feature,
-            inserted_at: now
-          }
+          %{type: type, event: feature}
         end
 
         event_rows =
