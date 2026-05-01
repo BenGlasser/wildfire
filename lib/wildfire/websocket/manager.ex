@@ -16,7 +16,6 @@ defmodule Wildfire.WebSocket.Manager do
   def broadcast(stream, msg) do
     case stream do
       :root ->
-        IO.inspect("HERE!")
         Registry.dispatch(Wildfire.WebSocket.Manager, :incidents, fn entries ->
           for {pid, _} <- entries, do: send(pid, {:incidents_changed, msg})
         end)
