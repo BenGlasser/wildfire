@@ -54,16 +54,16 @@ defmodule Wildfire.WebSocket.Handler do
   defp do_init(:incidents, %{"offset" => offset_str}) do
     case parse_offset(offset_str) do
       {:ok, offset} ->
-        events =
+        messages =
           from(e in IncidentEvents,
             where: e.id >= ^offset,
             order_by: [asc: e.id],
             select: e.event
           )
           |> Repo.all()
+          |> Enum.map(fn event -> {:text, Jason.encode!(event)} end)
 
-        json = Jason.encode!(events)
-        {:push, {:text, json}, %{}}
+        {:push, messages, %{}}
 
       :error ->
         do_init(:incidents, %{})
