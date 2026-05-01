@@ -96,6 +96,9 @@ defmodule Wildfire.Poller do
             :incidents,
             %{resolved_incidents: resolved_source_ids}
           )
+
+          from(i in Incident, where: i.source_id in ^resolved_source_ids)
+          |> Repo.delete_all()
         end
 
         Logger.info(
