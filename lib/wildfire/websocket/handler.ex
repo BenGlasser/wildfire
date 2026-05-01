@@ -75,7 +75,7 @@ defmodule Wildfire.WebSocket.Handler do
       Repo.all(Incident)
       |> Enum.map(& &1.feature)
 
-    json = Jason.encode!(features)
+    json = Jason.encode!(%{init: features})
     {:push, {:text, json}, %{}}
   end
 
