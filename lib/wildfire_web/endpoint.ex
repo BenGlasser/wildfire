@@ -10,6 +10,13 @@ defmodule WildfireWeb.Endpoint do
 
   socket("/live", Phoenix.LiveView.Socket, websocket: [connect_info: [session: @session_options]])
 
+  plug(Plug.Static,
+    at: "/",
+    from: :wildfire,
+    gzip: false,
+    only: WildfireWeb.static_paths()
+  )
+
   plug(Plug.RequestId)
   plug(Plug.Telemetry, event_prefix: [:phoenix, :endpoint])
 

@@ -34,7 +34,8 @@ defmodule Wildfire.MixProject do
       {:phoenix, "~> 1.7"},
       {:phoenix_html, "~> 4.1"},
       {:phoenix_live_view, "~> 1.0"},
-      {:phoenix_pubsub, "~> 2.1"}
+      {:phoenix_pubsub, "~> 2.1"},
+      {:esbuild, "~> 0.8", runtime: Mix.env() == :dev}
     ]
   end
 end

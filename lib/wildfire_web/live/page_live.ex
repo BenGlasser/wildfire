@@ -10,6 +10,9 @@ defmodule WildfireWeb.PageLive do
   def render(assigns) do
     ~H"""
     <h1>hello world</h1>
+    <div id="spike001-map" phx-hook="MapHook" data-points="ping">
+      hook target (server-rendered fallback)
+    </div>
     """
   end
 end

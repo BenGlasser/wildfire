@@ -24,4 +24,13 @@ config :wildfire, WildfireWeb.Endpoint,
   live_view: [signing_salt: "wildfireLV0"],
   secret_key_base: "rT8xq3hZk6Lp2WnYbVcJ4eMaQs7fGdHuKj9oRwIyT5BvNxUmCzDlPgErAhSbXi0F"
 
+config :esbuild,
+  version: "0.21.5",
+  wildfire: [
+    args:
+      ~w(js/app.js --bundle --target=es2022 --outdir=../priv/static/assets --external:/fonts/* --external:/images/*),
+    cd: Path.expand("../assets", __DIR__),
+    env: %{"NODE_PATH" => Path.expand("../deps", __DIR__)}
+  ]
+
 import_config "#{config_env()}.exs"

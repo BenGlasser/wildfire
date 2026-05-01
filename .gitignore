@@ -31,3 +31,6 @@ deps/*
 test/*
 .planning
 .planning/*
+
+# esbuild output
+priv/static/assets/
