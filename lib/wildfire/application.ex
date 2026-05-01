@@ -9,9 +9,11 @@ defmodule Wildfire.Application do
   def start(_type, _args) do
     children = [
       Wildfire.Repo,
+      {Phoenix.PubSub, name: Wildfire.PubSub},
       {Registry, keys: :duplicate, name: Wildfire.WebSocket.Manager},
       Wildfire.Poller,
-      {Bandit, plug: Wildfire.Router, port: Application.get_env(:wildfire, :http_port, 4000)}
+      {Bandit, plug: Wildfire.Router, port: Application.get_env(:wildfire, :http_port, 4000)},
+      WildfireWeb.Endpoint
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

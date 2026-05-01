@@ -30,7 +30,11 @@ defmodule Wildfire.MixProject do
       {:websock_adapter, "~> 0.5"},
       {:jason, "~> 1.4"},
       {:req, "~> 0.5"},
-      {:telemetry, "~> 1.0"}
+      {:telemetry, "~> 1.0"},
+      {:phoenix, "~> 1.7"},
+      {:phoenix_html, "~> 4.1"},
+      {:phoenix_live_view, "~> 1.0"},
+      {:phoenix_pubsub, "~> 2.1"}
     ]
   end
 end
