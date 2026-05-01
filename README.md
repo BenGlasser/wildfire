@@ -26,7 +26,7 @@ Pick one path:
 
 **Native**
 - [asdf](https://asdf-vm.com/) with Elixir and Erlang plugins (versions pinned in `.tool-versions`: Elixir 1.19.5-otp-28, Erlang 28.5)
-- Node + [pnpm](https://pnpm.io/) for the UI
+- Node + Vite + [pnpm](https://pnpm.io/) for the UI
 - PostgreSQL running on `localhost:5432`
 
 ## Setup & Run
@@ -62,7 +62,7 @@ pnpm dev
 
 In dev and test, the database connection uses static defaults from `config/config.exs` (database `wildfire_dev`, user `postgres`, password `postgres`, host `localhost`, port `5432`).
 
-In prod, the following environment variables are read at startup via `config/runtime.exs`:
+The following environment variables are read at startup via `config/runtime.exs`:
 
 | Variable            | Default          |
 |---------------------|------------------|
@@ -94,5 +94,5 @@ websocat ws://localhost:4000/ws/incidents
 ## Testing
 
 ```bash
-mix test
+mix test (currently broken 😞)
 ```
