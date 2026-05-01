@@ -2,7 +2,7 @@ defmodule Wildfire.WebSocket.Handler do
   @behaviour WebSock
 
   alias Wildfire.Repo
-  alias Wildfire.Incident
+  alias Wildfire.Data.Schema.Incident
 
   @impl true
   def init(stream) do
@@ -57,5 +57,4 @@ defmodule Wildfire.WebSocket.Handler do
     connections = Registry.lookup(Wildfire.WebSocket.Manager, :telemetry)
     {:push, {:text, "#{length(connections)}"}, %{}}
   end
-
 end

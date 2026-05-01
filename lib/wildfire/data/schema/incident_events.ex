@@ -3,6 +3,8 @@ defmodule Wildfire.Data.Schema.IncidentEvents do
   import Ecto.Changeset
 
   @types [:created, :updated, :resolved]
+  @required_fields [:object_id, :type, :occurred_at, :feature]
+  @allowed_fields @required_fields ++ []
 
   schema "incident_events" do
     field(:object_id, :integer)
@@ -13,11 +15,10 @@ defmodule Wildfire.Data.Schema.IncidentEvents do
     timestamps(updated_at: false)
   end
 
-  @required_fields ~w(object_id type occurred_at feature)a
 
   def changeset(event, attrs) do
     event
-    |> cast(attrs, @required_fields)
+    |> cast(attrs, @allowed_fields)
     |> validate_required(@required_fields)
     |> validate_inclusion(:type, @types)
   end

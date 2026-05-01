@@ -1,4 +1,4 @@
-defmodule Wildfire.Incident do
+defmodule Wildfire.Data.Schema.Incident do
   use Ecto.Schema
 
   schema "incidents" do
