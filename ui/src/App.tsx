@@ -9,9 +9,7 @@ function App() {
 
 
   return (
-    <>
-      <Map geojson={geojson} />
-    </>
+    <Map geojson={geojson} />
   )
 }
 

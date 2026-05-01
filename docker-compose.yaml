@@ -1,0 +1,37 @@
+services:
+  wildfire:
+    build: .
+    container_name: wildfire
+    ports:
+      - "4000:4000"
+      - "5173:5173"
+    tty: true
+    stdin_open: true
+    depends_on:
+      - postgres
+    environment:
+      DATABASE_HOST: postgres
+    volumes:
+      - .:/app
+      - deps:/app/deps
+      - build:/app/_build
+      - node_modules:/app/ui/node_modules
+
+  postgres:
+    image: postgres:alpine3.19
+    container_name: postgres
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: wildfire_dev
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+volumes:
+  deps:
+  build:
+  node_modules:
+  postgres-data:

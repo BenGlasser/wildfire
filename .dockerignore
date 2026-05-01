@@ -1,0 +1,12 @@
+_build
+deps
+.elixir_ls
+ui/node_modules
+ui/dist
+.git
+.planning
+.devcontainer
+.playwright-mcp
+.remember
+.vscode
+*.log

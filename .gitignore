@@ -31,3 +31,5 @@ deps/*
 test/*
 .planning
 .planning/*
+.pnpm-store/
+.playwright-mcp/

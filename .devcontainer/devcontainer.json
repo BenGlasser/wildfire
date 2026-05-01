@@ -1,0 +1,19 @@
+{
+  "name": "wildfire",
+  "dockerComposeFile": ["../docker-compose.yaml"],
+  "service": "wildfire",
+  "workspaceFolder": "/app",
+  "overrideCommand": true,
+  "forwardPorts": [4000, 5173, 5432],
+  "postCreateCommand": "mix deps.get && cd ui && pnpm install",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "elixir-lsp.elixir-ls",
+        "JakeBecker.elixir-ls",
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode"
+      ]
+    }
+  }
+}

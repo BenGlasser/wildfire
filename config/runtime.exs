@@ -1,5 +1,9 @@
 import Config
 
+if database_host = System.get_env("DATABASE_HOST") do
+  config :wildfire, Wildfire.Repo, hostname: database_host
+end
+
 if config_env() == :prod do
   config :wildfire, Wildfire.Repo,
     database: System.get_env("DATABASE_NAME", "wildfire_prod"),
