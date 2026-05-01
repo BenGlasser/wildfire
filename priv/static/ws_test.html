@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Wildfire WS Test</title>
+    <style>
+      :root { color-scheme: light dark; }
+      body { font: 14px/1.4 system-ui, sans-serif; margin: 0; padding: 1rem; max-width: 900px; }
+      header { display: flex; gap: .5rem; align-items: center; flex-wrap: wrap; }
+      input, button { font: inherit; padding: .35rem .6rem; }
+      input[type=text] { flex: 1; min-width: 280px; }
+      .status { padding: .15rem .5rem; border-radius: .25rem; font-weight: 600; }
+      .status.connecting { background: #fde68a; color: #78350f; }
+      .status.open       { background: #bbf7d0; color: #14532d; }
+      .status.closed     { background: #fecaca; color: #7f1d1d; }
+      .row { display: flex; gap: .5rem; margin-top: .75rem; }
+      #log { margin-top: 1rem; height: 60vh; overflow: auto; border: 1px solid #8884; border-radius: .5rem; padding: .5rem; }
+      .msg { padding: .35rem .5rem; border-radius: .35rem; margin-bottom: .35rem; font-family: ui-monospace, monospace; white-space: pre-wrap; word-break: break-word; }
+      .msg.in   { background: #dbeafe33; border-left: 3px solid #3b82f6; }
+      .msg.out  { background: #fef3c733; border-left: 3px solid #f59e0b; }
+      .msg.sys  { background: #e5e7eb33; border-left: 3px solid #6b7280; font-style: italic; }
+      .ts { opacity: .6; margin-right: .5rem; }
+      details summary { cursor: pointer; opacity: .8; }
+      pre { margin: .5rem 0 0; }
+    </style>
+  </head>
+  <body>
+    <h1>Wildfire WebSocket tester</h1>
+
+    <header>
+      <label>URL <input id="url" type="text" /></label>
+      <button id="connect">Connect</button>
+      <button id="disconnect" disabled>Disconnect</button>
+      <button id="clear">Clear log</button>
+      <span id="status" class="status closed">closed</span>
+    </header>
+
+    <div class="row">
+      <input id="msg" type="text" placeholder='Send to server (text)…  e.g. "ping"' />
+      <button id="send" disabled>Send</button>
+    </div>
+
+    <div id="log" aria-live="polite"></div>
+
+    <script>
+      const $ = (id) => document.getElementById(id);
+      const urlInput = $("url");
+      const status = $("status");
+      const log = $("log");
+
+      const defaultUrl = `${location.protocol === "https:" ? "wss" : "ws"}://${location.host}/ws`;
+      urlInput.value = defaultUrl;
+
+      let ws = null;
+
+      function setStatus(s) {
+        status.className = `status ${s}`;
+        status.textContent = s;
+      }
+
+      function tryParseJson(text) {
+        if (typeof text !== "string") return null;
+        const trimmed = text.trim();
+        if (!trimmed.startsWith("{") && !trimmed.startsWith("[")) return null;
+        try { return JSON.parse(trimmed); } catch { return null; }
+      }
+
+      function add(kind, text) {
+        const div = document.createElement("div");
+        div.className = `msg ${kind}`;
+
+        const ts = document.createElement("span");
+        ts.className = "ts";
+        ts.textContent = new Date().toLocaleTimeString();
+        div.appendChild(ts);
+
+        const parsed = tryParseJson(text);
+        if (parsed !== null) {
+          const details = document.createElement("details");
+          const summary = document.createElement("summary");
+          const count = Array.isArray(parsed) ? `${parsed.length} item(s)` : "object";
+          const preview = text.length > 80 ? text.slice(0, 80) + "…" : text;
+          summary.textContent = `JSON (${count}) — ${preview}`;
+          const pre = document.createElement("pre");
+          pre.textContent = JSON.stringify(parsed, null, 2);
+          details.appendChild(summary);
+          details.appendChild(pre);
+          div.appendChild(details);
+        } else {
+          const span = document.createElement("span");
+          span.textContent = text;
+          div.appendChild(span);
+        }
+
+        log.appendChild(div);
+        log.scrollTop = log.scrollHeight;
+      }
+
+      function connect() {
+        if (ws && ws.readyState !== WebSocket.CLOSED) return;
+        const url = urlInput.value.trim();
+        add("sys", `connecting to ${url}`);
+        setStatus("connecting");
+        try {
+          ws = new WebSocket(url);
+        } catch (e) {
+          add("sys", `error: ${e.message}`);
+          setStatus("closed");
+          return;
+        }
+
+        ws.addEventListener("open", () => {
+          setStatus("open");
+          add("sys", "connection open");
+          $("disconnect").disabled = false;
+          $("connect").disabled = true;
+          $("send").disabled = false;
+        });
+        ws.addEventListener("message", (e) => {
+          add("in", typeof e.data === "string" ? e.data : "[binary]");
+        });
+        ws.addEventListener("error", () => add("sys", "socket error"));
+        ws.addEventListener("close", (e) => {
+          setStatus("closed");
+          add("sys", `closed (code=${e.code}${e.reason ? `, reason="${e.reason}"` : ""})`);
+          $("disconnect").disabled = true;
+          $("connect").disabled = false;
+          $("send").disabled = true;
+        });
+      }
+
+      function disconnect() {
+        if (ws) ws.close(1000, "client disconnect");
+      }
+
+      function send() {
+        const text = $("msg").value;
+        if (!text || !ws || ws.readyState !== WebSocket.OPEN) return;
+        ws.send(text);
+        add("out", text);
+        $("msg").value = "";
+      }
+
+      $("connect").addEventListener("click", connect);
+      $("disconnect").addEventListener("click", disconnect);
+      $("send").addEventListener("click", send);
+      $("clear").addEventListener("click", () => { log.textContent = ""; });
+      $("msg").addEventListener("keydown", (e) => { if (e.key === "Enter") send(); });
+    </script>
+  </body>
+</html>
