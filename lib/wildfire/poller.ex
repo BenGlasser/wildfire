@@ -5,7 +5,7 @@ defmodule Wildfire.Poller do
   import Ecto.Query
 
   alias Wildfire.Repo
-  alias Wildfire.Incident
+  alias Wildfire.Data.Schema.Incident
 
   def start_link(opts), do: GenServer.start_link(__MODULE__, opts, name: __MODULE__)
 
@@ -89,6 +89,27 @@ defmodule Wildfire.Poller do
             on_conflict: {:replace, [:feature, :feature_hash, :updated_at]},
             conflict_target: :source_id
           )
+        end)
+
+        build_event = fn feature, type ->
+          %{
+            object_id: get_in(feature, ["properties", "OBJECTID"]),
+            type: type,
+            occurred_at: now,
+            feature: feature,
+            inserted_at: now
+          }
+        end
+
+        event_rows =
+          Enum.map(created, &build_event.(&1.feature, :created)) ++
+            Enum.map(changed, &build_event.(&1.feature, :updated)) ++
+            Enum.map(resolved_features, &build_event.(&1, :resolved))
+
+        event_rows
+        |> Enum.chunk_every(500)
+        |> Enum.each(fn chunk ->
+          Repo.insert_all(Wildfire.Data.Schema.IncidentEvents, chunk)
         end)
 
         if changed != [] do
