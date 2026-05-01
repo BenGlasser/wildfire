@@ -29,3 +29,5 @@ tmp/
 _build/*
 deps/*
 test/*
+.planning
+.planning/*
