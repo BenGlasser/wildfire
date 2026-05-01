@@ -24,8 +24,8 @@ defmodule Wildfire.WebSocket.Handler do
   # BROADCAST ############################################
 
   @impl true
-  def handle_info({:incidents_changed, %{changed_incidents: features}}, state) do
-    json = Jason.encode!(features)
+  def handle_info({:incidents_changed, event}, state) do
+    json = Jason.encode!(event)
     {:push, {:text, json}, state}
   end
 

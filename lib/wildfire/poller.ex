@@ -60,7 +60,10 @@ defmodule Wildfire.Poller do
 
         changed =
           Enum.filter(candidates, fn row ->
-            Map.get(old_hashes, row.source_id) != row.feature_hash
+            case Map.fetch(old_hashes, row.source_id) do
+              {:ok, hash} -> hash != row.feature_hash
+              :error -> false
+            end
           end)
 
         resolved_source_ids =
@@ -68,7 +71,18 @@ defmodule Wildfire.Poller do
           |> MapSet.difference(polled_source_id_set)
           |> MapSet.to_list()
 
-        changed
+        resolved_features =
+          if resolved_source_ids == [] do
+            []
+          else
+            from(i in Incident,
+              where: i.source_id in ^resolved_source_ids,
+              select: i.feature
+            )
+            |> Repo.all()
+          end
+
+        (created ++ changed)
         |> Enum.chunk_every(500)
         |> Enum.each(fn chunk ->
           Repo.insert_all(Incident, chunk,
@@ -80,21 +94,21 @@ defmodule Wildfire.Poller do
         if changed != [] do
           Wildfire.WebSocket.Manager.broadcast(
             :incidents,
-            %{changed_incidents: Enum.map(changed, & &1.feature)}
+            %{updated: Enum.map(changed, & &1.feature)}
           )
         end
 
         if created != [] do
           Wildfire.WebSocket.Manager.broadcast(
             :incidents,
-            %{created_incidents: Enum.map(created, & &1.feature)}
+            %{created: Enum.map(created, & &1.feature)}
           )
         end
 
         if resolved_source_ids != [] do
           Wildfire.WebSocket.Manager.broadcast(
             :incidents,
-            %{resolved_incidents: resolved_source_ids}
+            %{resolved: resolved_features}
           )
 
           from(i in Incident, where: i.source_id in ^resolved_source_ids)
