@@ -131,24 +131,48 @@ Hooks.D3Map = {
 
     function drawPoints(ctx, t) {
       const pulse = 0.5 + 0.5 * Math.sin(t / 600);
-      // additive blending so overlapping glows pile up like real fire
       ctx.globalCompositeOperation = "lighter";
-      for (const p of projected) {
-        // big soft halo
-        const haloR = (p.r + 2) * (2.4 + pulse * 0.6);
+      for (let i = projected.length - 1; i >= 0; i--) {
+        const p = projected[i];
+
+        // arrival/exit animation
+        let lifeScale = 1;
+        let exiting = false;
+        if (p.bornAt) {
+          const age = t - p.bornAt;
+          if (age < 1500) lifeScale = 1 + 1.6 * (1 - age / 1500); // grow then settle
+          else p.bornAt = null;
+        }
+        if (p.exitAt) {
+          const dying = t - p.exitAt;
+          if (dying > 1200) {
+            projected.splice(i, 1);
+            continue;
+          }
+          lifeScale = 1 - dying / 1200;
+          exiting = true;
+        }
+
+        const haloR = (p.r + 2) * (2.4 + pulse * 0.6) * lifeScale;
+        const alphaCore = exiting ? lifeScale : 1;
         const glow = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, haloR);
-        glow.addColorStop(0, "rgba(255,180,90,0.85)");
-        glow.addColorStop(0.45, "rgba(255,80,40,0.35)");
-        glow.addColorStop(1, "rgba(255,40,20,0)");
+        if (exiting) {
+          glow.addColorStop(0, `rgba(180,180,200,${0.75 * lifeScale})`);
+          glow.addColorStop(0.5, `rgba(120,140,170,${0.25 * lifeScale})`);
+          glow.addColorStop(1, "rgba(80,100,130,0)");
+        } else {
+          glow.addColorStop(0, "rgba(255,180,90,0.85)");
+          glow.addColorStop(0.45, "rgba(255,80,40,0.35)");
+          glow.addColorStop(1, "rgba(255,40,20,0)");
+        }
         ctx.fillStyle = glow;
         ctx.beginPath();
         ctx.arc(p.x, p.y, haloR, 0, Math.PI * 2);
         ctx.fill();
 
-        // bright opaque core
         ctx.beginPath();
-        ctx.arc(p.x, p.y, Math.max(p.r, 2), 0, Math.PI * 2);
-        ctx.fillStyle = "#fff2c8";
+        ctx.arc(p.x, p.y, Math.max(p.r, 2) * (exiting ? lifeScale : 1), 0, Math.PI * 2);
+        ctx.fillStyle = exiting ? `rgba(220,225,240,${alphaCore})` : "#fff2c8";
         ctx.fill();
       }
       ctx.globalCompositeOperation = "source-over";
@@ -202,6 +226,30 @@ Hooks.D3Map = {
       }
     });
     d3.select(canvas).on("mouseleave", () => tooltip.style("opacity", 0));
+
+    // Live updates from LiveView
+    this.handleEvent("incidents:delta", ({ type, points: incoming }) => {
+      const now = performance.now();
+      console.log(`[D3Map] delta type=${type} n=${incoming.length}`);
+      if (type === "created" || type === "updated") {
+        for (const p of incoming) {
+          const xy = projection([p.lon, p.lat]);
+          if (!xy) continue;
+          const r = radiusScale((p.size ?? 1) || 1);
+          const idx = projected.findIndex(x => x.id === p.id);
+          if (idx >= 0) {
+            projected[idx] = { ...projected[idx], ...p, x: xy[0], y: xy[1], r, bornAt: now };
+          } else {
+            projected.push({ ...p, x: xy[0], y: xy[1], r, bornAt: now });
+          }
+        }
+      } else if (type === "resolved") {
+        const ids = new Set(incoming.map(p => p.id).filter(Boolean));
+        for (const p of projected) {
+          if (ids.has(p.id) && !p.exitAt) p.exitAt = now;
+        }
+      }
+    });
 
     const t1 = performance.now();
     console.log(`[D3Map] points=${projected.length}/${points.length} setup=${(t1 - t0).toFixed(1)}ms`);

@@ -108,6 +108,12 @@ defmodule Wildfire.Poller do
 
         Enum.each(event_rows, fn row ->
           Wildfire.WebSocket.Manager.broadcast(:incidents, row.event)
+
+          Phoenix.PubSub.broadcast(
+            Wildfire.PubSub,
+            "incidents",
+            {:incident_event, row.type, row.event[row.type]}
+          )
         end)
 
         if resolved_source_ids != [] do

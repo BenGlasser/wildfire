@@ -6,6 +6,8 @@ defmodule WildfireWeb.D3Live do
 
   @impl true
   def mount(_params, _session, socket) do
+    if connected?(socket), do: Phoenix.PubSub.subscribe(Wildfire.PubSub, "incidents")
+
     points =
       Repo.all(Incident)
       |> Enum.map(&to_point/1)
@@ -13,6 +15,28 @@ defmodule WildfireWeb.D3Live do
 
     {:ok, assign(socket, points: points, count: length(points))}
   end
+
+  @impl true
+  def handle_info({:incident_event, type, features}, socket) when is_list(features) do
+    points =
+      features
+      |> Enum.map(&feature_to_point/1)
+      |> Enum.reject(&is_nil/1)
+
+    socket =
+      socket
+      |> push_event("incidents:delta", %{type: type, points: points})
+      |> update_count(type, length(points))
+
+    {:noreply, socket}
+  end
+
+  defp update_count(socket, :created, n), do: assign(socket, count: socket.assigns.count + n)
+
+  defp update_count(socket, :resolved, n),
+    do: assign(socket, count: max(0, socket.assigns.count - n))
+
+  defp update_count(socket, _type, _n), do: socket
 
   @impl true
   def render(assigns) do
@@ -53,6 +77,21 @@ defmodule WildfireWeb.D3Live do
   end
 
   defp to_point(_), do: nil
+
+  defp feature_to_point(%{
+         "geometry" => %{"type" => "Point", "coordinates" => [lon, lat]},
+         "properties" => props
+       }) do
+    %{
+      id: props["GlobalID"],
+      lon: lon,
+      lat: lat,
+      name: props["IncidentName"],
+      size: parse_num(props["IncidentSize"])
+    }
+  end
+
+  defp feature_to_point(_), do: nil
 
   defp parse_num(n) when is_number(n), do: n
 
