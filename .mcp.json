@@ -5,13 +5,13 @@
       "args": [
         "/Users/benglasser/.asdf/installs/nodejs/24.14.0/lib/node_modules/gsd-pi/packages/mcp-server/dist/cli.js"
       ],
-      "cwd": "/Users/benglasser/git/wildfire2",
+      "cwd": "/Users/benglasser/git/wildfire",
       "env": {
         "GSD_CLI_PATH": "/Users/benglasser/.asdf/installs/nodejs/24.14.0/bin/gsd",
         "GSD_WORKFLOW_EXECUTORS_MODULE": "/Users/benglasser/.gsd/agent/extensions/gsd/tools/workflow-tool-executors.js",
         "GSD_WORKFLOW_WRITE_GATE_MODULE": "/Users/benglasser/.gsd/agent/extensions/gsd/bootstrap/write-gate.js",
         "GSD_PERSIST_WRITE_GATE_STATE": "1",
-        "GSD_WORKFLOW_PROJECT_ROOT": "/Users/benglasser/git/wildfire2"
+        "GSD_WORKFLOW_PROJECT_ROOT": "/Users/benglasser/git/wildfire"
       }
     }
   }

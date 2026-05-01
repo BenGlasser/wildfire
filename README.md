@@ -18,13 +18,13 @@ mix ecto.create && mix ecto.migrate
 
 ## Configuration
 
-In dev and test, the database connection uses static defaults from `config/config.exs` (database `wildfire2_dev`, user `postgres`, password `postgres`, host `localhost`, port `5432`).
+In dev and test, the database connection uses static defaults from `config/config.exs` (database `wildfire_dev`, user `postgres`, password `postgres`, host `localhost`, port `5432`).
 
 In prod, the following environment variables are read at startup via `config/runtime.exs`:
 
 | Variable            | Default          |
 |---------------------|------------------|
-| `DATABASE_NAME`     | `wildfire2_prod`  |
+| `DATABASE_NAME`     | `wildfire_prod`  |
 | `DATABASE_USER`     | `postgres`       |
 | `DATABASE_PASSWORD` | `postgres`       |
 | `DATABASE_HOST`     | `localhost`      |

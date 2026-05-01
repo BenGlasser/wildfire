@@ -1,4 +1,4 @@
-# wildfire2
+# wildfire
 
 ## What This Is
 
@@ -79,7 +79,7 @@ practical latency and an optional cursor replay for late joiners.
 | Single firehose channel (no per-incident topics) | Matches "fastest possible distribution" mandate | — Pending |
 | Default WS endpoint `0.0.0.0:4000/ws` | Familiar dev port, single path, runtime-overridable | — Pending |
 | Default poll cadences 30s / 5m | Live-feel without hammering ESRI; runtime-overridable | — Pending |
-| App name `wildfire2` | Matches repo directory | — Pending |
+| App name `wildfire` | Matches repo directory | — Pending |
 
 ## Evolution
 

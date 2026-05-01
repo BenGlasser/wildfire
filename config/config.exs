@@ -3,7 +3,7 @@ import Config
 config :wildfire, ecto_repos: [Wildfire.Repo]
 
 config :wildfire, Wildfire.Repo,
-  database: "wildfire2_dev",
+  database: "wildfire_dev",
   username: "postgres",
   password: "postgres",
   hostname: "localhost",
