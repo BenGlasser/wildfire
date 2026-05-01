@@ -1,58 +1,10 @@
 import { Socket } from "phoenix";
 import { LiveSocket } from "phoenix_live_view";
-import L from "leaflet";
-import "leaflet/dist/leaflet.css";
 import * as d3 from "d3";
 import { feature as topo2geo } from "topojson-client";
 import usAtlas from "us-atlas/states-10m.json";
 
 const Hooks = {};
-
-// Spike 001 sanity hook
-Hooks.MapHook = {
-  mounted() {
-    console.log("[MapHook] mounted on", this.el.id, "dataset.points sample:", (this.el.dataset.points || "").slice(0, 80));
-    this.el.innerText = "[MapHook] mounted ✓";
-  }
-};
-
-// Spike 002a — Leaflet
-Hooks.LeafletMap = {
-  mounted() {
-    const t0 = performance.now();
-    const points = JSON.parse(this.el.dataset.points || "[]");
-    console.log(`[LeafletMap] points=${points.length}`);
-
-    const map = L.map(this.el, { preferCanvas: true }).setView([39.5, -98.35], 4);
-    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-      maxZoom: 18,
-      attribution: "© OpenStreetMap"
-    }).addTo(map);
-
-    const t1 = performance.now();
-    const markers = [];
-    for (const p of points) {
-      const m = L.circleMarker([p.lat, p.lon], {
-        radius: Math.max(3, Math.min(12, Math.sqrt((p.size || 1)) / 8)),
-        color: "#d33",
-        weight: 1,
-        fillColor: "#f55",
-        fillOpacity: 0.6
-      }).bindPopup(`<strong>${p.name || "(unnamed)"}</strong><br>size: ${p.size ?? "?"}`);
-      m.addTo(map);
-      markers.push(m);
-    }
-    const t2 = performance.now();
-    console.log(`[LeafletMap] tiles=${(t1 - t0).toFixed(1)}ms markers=${(t2 - t1).toFixed(1)}ms total=${(t2 - t0).toFixed(1)}ms`);
-
-    this._map = map;
-    this._markers = markers;
-    window._leafletSpike = { map, markers, points };
-  },
-  destroyed() {
-    if (this._map) this._map.remove();
-  }
-};
 
 // Spike 002c — D3 canvas map (dark theme, glowing pulsing incidents)
 Hooks.D3Map = {

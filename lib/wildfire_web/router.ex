@@ -13,8 +13,6 @@ defmodule WildfireWeb.Router do
   scope "/", WildfireWeb do
     pipe_through(:browser)
 
-    live("/", PageLive, :index)
-    live("/leaflet", LeafletLive, :index)
-    live("/d3", D3Live, :index)
+    live("/", D3Live, :index)
   end
 end
