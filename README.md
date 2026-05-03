@@ -2,6 +2,23 @@
 
 Real-time wildfire incident monitor that polls ESRI ArcGIS, persists incident events to PostgreSQL, and pushes GeoJSON updates to WebSocket clients. A small React + Vite UI renders the live map.
 
+## Feature set
+✔ Websocket 
+    - http://localhost:4000/test
+    - ws://localhost:4000/ws
+    - ws://localhost:4000/ws/incidents
+✔ UI to visualize current fires
+    - http://localhost:5173/
+✔ Packaging and deployment plan
+    - `docker compose up -d`
+ｘ Unit/Integration tests
+    - AI generated
+    - currently broken
+ｘ Telemetry/Monitoring of workload
+    - I thought about it 🤔
+ｘ Perimeter data
+    - ¯⁠\⁠_⁠(⁠ツ⁠)⁠_⁠/⁠¯
+
 ## Local Endpoints
 
 When running locally (via `docker compose up` or `mix run --no-halt` + `pnpm --dir ui dev`):

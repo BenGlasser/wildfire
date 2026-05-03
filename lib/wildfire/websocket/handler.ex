@@ -48,7 +48,30 @@ defmodule Wildfire.WebSocket.Handler do
   # INITIALIZERS #########################################
 
   defp do_init(:root, _params) do
-    {:push, {:text, "I am Groot! 🪾"}, %{}}
+    baseURL = Application.get_env(:wildfire, :base_url, "http://localhost:4000")
+    menu = %{ # TODO: create actual json schemas for these https://json-schema.org/
+      menu: [
+        %{name: "Incidents",
+          topic: "incidents",
+          endpoint: "#{baseURL}/ws/incidents",
+          description: "Real-time updates on wildfire incidents, including new reports, status changes, and resolved cases.",
+          events: [
+            %{name: "Initial Load", key: "init", description: "Initial load of all active incidents when the client connects."},
+            %{name: "New Incident", key: "created", description: "Triggered when a new wildfire incident is reported."},
+            %{name: "Status Update", key: "updated", description: "Triggered when the status of an existing incident changes (e.g., from 'active' to 'contained')."},
+            %{name: "Incident Resolved", key: "resolved", description: "Triggered when an incident is marked as resolved."}
+          ]},
+
+        %{name: "Telemetry",
+          stream: "telemetry",
+          endpoint: "#{baseURL}/ws/telemetry",
+          description: "Real-time updates on telemetry data.",
+          events: [
+            %{name: "Connection Count", description: "Updates on the number of active WebSocket connections."}
+          ]
+        }
+      ]}
+    {:push, {:text, JSON.encode!(menu)}, %{}}
   end
 
   defp do_init(:incidents, %{"offset" => offset_str}) do

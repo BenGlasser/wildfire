@@ -122,12 +122,7 @@ function toProjected(
 
 function sizeOf(feature: IncidentFeature): number {
   const raw = feature.properties?.IncidentSize;
-  if (typeof raw === "number") return raw;
-  if (typeof raw === "string") {
-    const parsed = parseFloat(raw);
-    return Number.isFinite(parsed) ? parsed : 0;
-  }
-  return 0;
+  return parseFloat(raw as string) || 0;
 }
 
 export default Map;
