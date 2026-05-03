@@ -19,7 +19,7 @@ Unit/Integration tests
 - currently broken
 
 ｘ Telemetry/Monitoring of workload
-_ I thought about it 🤔
+- I thought about it 🤔
 
 ｘ Perimeter data
 - ¯⁠\⁠_⁠(⁠ツ⁠)⁠_⁠/⁠¯
