@@ -7,15 +7,20 @@ Real-time wildfire incident monitor that polls ESRI ArcGIS, persists incident ev
     - http://localhost:4000/test
     - ws://localhost:4000/ws
     - ws://localhost:4000/ws/incidents
+
 ✔ UI to visualize current fires
     - http://localhost:5173/
+
 ✔ Packaging and deployment plan
     - `docker compose up -d`
+  
 ｘ Unit/Integration tests
     - AI generated
     - currently broken
+
 ｘ Telemetry/Monitoring of workload
     - I thought about it 🤔
+
 ｘ Perimeter data
     - ¯⁠\⁠_⁠(⁠ツ⁠)⁠_⁠/⁠¯
 
