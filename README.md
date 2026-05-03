@@ -13,16 +13,6 @@ Real-time wildfire incident monitor that polls ESRI ArcGIS, persists incident ev
 
 ✅ Packaging and deployment plan
 - `docker compose up -d`
-  
-Unit/Integration tests
-- AI generated
-- currently broken
-
-ｘ Telemetry/Monitoring of workload
-- I thought about it 🤔
-
-ｘ Perimeter data
-- ¯⁠\⁠_⁠(⁠ツ⁠)⁠_⁠/⁠¯
 
 ## Local Endpoints
 
